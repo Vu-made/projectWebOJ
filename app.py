@@ -500,3 +500,6 @@ if __name__ == "__main__":
         await init_db()
         await app.run_task(debug=True, port=5000)
     asyncio.run(start())
+
+#quanh xinh gai
+#vudz
