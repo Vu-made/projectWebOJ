@@ -136,9 +136,9 @@ def judge_code( data , config_json_str):
             "topic" : topic,
             "content" : {
                 "lang" : lang,
-                "code" : code, 
-                "code_exercise" : code_exercise
+                "code" : code
             },
+            "code_exercise" : code_exercise,
             "username" : data["username"]
         })
 

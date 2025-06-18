@@ -71,7 +71,16 @@ async def init_db():
                 CREATE TABLE IF NOT EXISTS solved_exercise( 
                     username VARCHAR(225),
                     content TEXT,
-                    topic TEXT,
+                    code_exercise TEXT,
+                    type TEXT,
+                    FOREIGN KEY ( username ) REFERENCES account(username) ON DELETE CASCADE 
+                );
+            ''')
+
+            await cur.execute('''
+                CREATE TABLE IF NOT EXISTS solved_exercise_pass( 
+                    username VARCHAR(225) UNIQUE,
+                    code_exercise TEXT,
                     FOREIGN KEY ( username ) REFERENCES account(username) ON DELETE CASCADE 
                 );
             ''')
@@ -161,13 +170,15 @@ async def home():
     if "username" not in session:
         profile_html =  await render_template("profile_empty.html")
     else : 
+        
         row = await execute("""
             SELECT full_name, email, interest, address, date, target 
             FROM account WHERE username=%s
         """, (session["username"],), fetch=True, one=True)
         profile_html = await render_template("profile_full.html",
                     full_name=row[0], email=row[1], interest=row[2],
-                    address=row[3], date=row[4], target=row[5]
+                    address=row[3], date=row[4], target=row[5],
+                    list_problem_submit= await get_problem_list_html( session["username"] )
                 )
 
     return await render_template("home.html",
@@ -329,12 +340,17 @@ async def result(job_id):
     job = Job.fetch(job_id, connection=Redis())
     if job.is_finished:
         for item in json.loads(job.result) : 
-            if "pass" in item and item["pass"] :
+            if "username" in item :
                 await execute ("""
-                        INSERT INTO solved_exercise ( username , content , topic )
-                        VALUES ( %s , %s , %s )
-                    """, ( item["username"] , json.dumps(item["content"]) , item["topic"] ))
-                break 
+                        INSERT INTO solved_exercise ( username , content , code_exercise , type )
+                        VALUES ( %s , %s , %s , %s )
+                    """, ( item["username"] , json.dumps(item["content"]) , item["code_exercise"] , ( "O" if item["pass"] else "X" ) ) )
+                if item["pass"] : 
+                    await execute ("""
+                        INSERT IGNORE INTO solved_exercise_pass ( username , code_exercise )
+                        VALUES ( %s , %s )
+                    """, ( item["username"] , item["code_exercise" ] ) )
+        
         return jsonify({"status": "done", "result": job.result})
     elif job.is_failed:
         return jsonify({"status": "failed"})
@@ -512,6 +528,35 @@ async def get_role( username ) :
     if row and row[0] : 
         return row[0]
     return None
+
+async def get_problem_list_html( username ) : 
+    problem = '' 
+    problemList = await execute ("""
+        SELECT meta.code_exercise AS code_exercise ,
+            meta.exercise AS exercise,
+            solved_exercise.username AS username,
+            solved_exercise.`type` AS `type`
+        FROM solved_exercise
+        JOIN meta ON meta.code_exercise = solved_exercise.code_exercise ;
+    """
+    , fetch=True )
+    if problemList :
+        for item in problemList :
+            if item[2] == username :
+                data = json.loads(item[1])
+                problem = f"""
+                    <tr>
+                        <td>{ data["titles"] }</td>
+                        <td class="{ "correct" if item[3] == "O" else "not-correct"}">
+                            <b>{ "đúng" if item[3]=="O" else "không đúng"}</b>
+                        </td>
+                        <td><button onclick="window.location.href='/render_exercise/{item[0]}'">xem</button></td>
+                    </tr>
+                """ + problem 
+        return problem
+    return "<tr><td>chưa chấm bài nào</td></tr>"
+
+
 
 # ============================ MAIN ==============================
 if __name__ == "__main__":
