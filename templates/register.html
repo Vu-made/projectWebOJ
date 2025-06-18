@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Đăng ký tài khoản</title>
+  <link rel="stylesheet" href="../static/register.css">
+</head>
+<body>
+  <form class="register-container" action="./submit" method="POST" enctype="multipart/form-data">
+     
+     <div id="window-left">
+        <label for="fullname">Họ và Tên:</label>
+        <input type="text" id="fullname" name="fullname" required value="{{ fullname }}">
+
+        <label for="phone">Số điện thoại:</label>
+        <input type="tel" id="phone" name="phone" required value="{{ phone }}">
+
+        
+
+        <label for="username">Tên đăng nhập:</label>
+        <input type="text" id="username" name="username" required value="{{ username }}">
+
+        <label for="password">Mật khẩu:</label>
+        <input type="password" id="password" name="password" required value="{{ password }}">
+
+        <label for="confirm_password">Xác nhận mật khẩu:</label>
+        <input type="password" id="confirm_password" name="confirm_password" required value="{{ confirm_password }}">
+
+        <div class="checkbox-label">
+          <input type="checkbox" id="hide" name="hide">
+          <label for="hide">Hiện mật khẩu</label>
+        </div>
+        <p class="error">{{ error }}</p>
+        <button type="submit" name="action" value="register">Đăng ký</button>
+     </div>
+
+     <div id="window-right">
+          <h2>Chào mừng bạn đến với trang web</h2>
+          <h2>Đăng ký tài khoản</h2>
+          <label for="avatar">Ảnh đại diện:</label>
+          <div class="avatar-preview" id="avatarPreview" style="display: none;">
+            <img id="avatarImage" src="/avatar/{{ user_id }}" alt="Xem trước ảnh đại diện">
+          </div>
+          <input type="file" id="avatar" name="avatar" accept="image/*">
+     </div>
+     
+  </form>
+
+  <script>
+    // Hiện/ẩn mật khẩu
+    document.getElementById('hide').addEventListener('change', function () {
+      const passwordField = document.getElementById('password');
+      const confirmPasswordField = document.getElementById('confirm_password');
+      const isVisible = this.checked;
+      passwordField.type = isVisible ? 'text' : 'password';
+      confirmPasswordField.type = isVisible ? 'text' : 'password';
+    });
+
+    // Xem trước ảnh đại diện
+    document.getElementById('avatar').addEventListener('change', function (event) {
+      const file = event.target.files[0];
+      const previewContainer = document.getElementById('avatarPreview');
+      const img = document.getElementById('avatarImage');
+
+      if (file && file.type.startsWith('image/')) {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          img.src = e.target.result;
+          previewContainer.style.display = 'block';
+        };
+        reader.readAsDataURL(file);
+      } else {
+        previewContainer.style.display = 'none';
+      }
+    });
+  </script>
+</body>
+</html>

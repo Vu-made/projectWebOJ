@@ -1,0 +1,88 @@
+.tab-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    width: 100% ;
+    height: 100% ;
+}
+
+.tab-buttons {
+    /* display: flex; */
+    /* background-color: #053bee; */
+    margin-bottom: 10px ;
+}
+
+.tab-buttons button {
+    padding: 16px;
+    font-size: 18px;
+    border: none;
+    background-color: #3d60d4;
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.tab-buttons button:hover {
+    background-color: #3b82f6;
+}
+
+.tab-buttons button.active {
+    background-color: rgba(70, 187, 255, 0.836);
+    color: #1e40af;
+    font-weight: bold;
+    border-bottom: 3px solid #1e40af;
+}
+
+.tab-content {
+    display: none;
+    background-color: white;
+    padding: 24px;
+    width: 100% ;
+    height: 100% ;
+    overflow-y: auto;
+}
+
+.tab-content.active {
+    width: 100% ;
+    height: 100%;
+    display: block;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    font-size: 16px;
+}
+
+th, td {
+    padding: 14px 18px;
+    border-bottom: 1px solid #ddd;
+    text-align: left;
+}
+
+th {
+    background-color: #2563eb;
+    color: white;
+}
+
+.view-button {
+    padding: 8px 16px;
+    background-color: #10b981;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.view-button:hover {
+    background-color: #059669;
+}
+
+footer {
+    background-color: #1e293b;
+    color: white;
+    text-align: center;
+    padding: 10px;
+    font-size: 14px;
+}

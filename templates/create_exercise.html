@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Bài Tập</title>
+  <link rel="stylesheet" href="../static/create_exercise.css">  
+  <style>
+
+  </style>
+</head>
+<body>
+  <main>
+    <div id="problem-inspace">
+      <div id="header-inspace">
+        
+      </div>
+      <div id="body-inspace">
+        
+      </div>
+      <div id="ex-inspace">
+        <table border="1">
+          <thead>
+            <tr>
+              <td>Input</td>
+              <td>Output</td>
+            </tr>
+          </thead>
+          <tbody id="hehe-inspace">
+            <tr>
+              <td>asdasdasdas 11</td>
+              <td>Lẻ</td>
+            </tr>
+            <tr>
+              <td>asda 4</td>
+              <td>Chẵn</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div id="problem-edit">
+      <h3 id="code_problem">mã đề : </h3>
+      <div id="header">
+        <div class="name-problem">
+            <input type="text" placeholder="Viết tiêu đề">
+            <button class="delete-btn" onclick="removeElement(this)">X</button>
+        </div>
+      </div>
+
+      <div id="body">
+        <div class="row-group">
+          <div class="toolbar">
+            <button onclick="execCmd('bold')"><b>B</b></button>
+            <button onclick="execCmd('italic')"><i>I</i></button>
+            <button onclick="execCmd('underline')"><u>U</u></button>
+            <button onclick="insertText(' ≤ ')">≤</button>
+            <button onclick="insertText(' ≥ ')">≥</button>
+            <button onclick="insertText(' ≠ ')">≠</button>
+            <button onclick="insertText(' ∑ ')">∑</button>
+          </div>
+          <div class="editor" contenteditable="true">
+            
+          </div>
+          <button class="delete-btn" onclick="removeElement(this)">X</button>
+        </div>
+      </div>
+
+      <div id="ex">
+        <table border="1">
+          <thead>
+            <tr>
+              <td>Input</td>
+              <td>Output</td>
+              <td>Xoá</td>
+            </tr>
+          </thead>
+          <tbody id="hehe">
+            <tr>
+              <td><textarea></textarea></td>
+              <td><textarea></textarea></td>
+              <td><button class="delete-btn" onclick="removeRow(this)">X</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div id="tool">
+      <div id="btn-tool">
+        <button class="btn-tool" onclick="add_tool('header')">Thêm khung tiêu đề</button>
+        <button class="btn-tool" onclick="add_tool('body')">Thêm khung viết câu hỏi</button>
+        <button class="btn-tool" onclick="add_tool('hehe')">Thêm khung ví dụ</button>
+      </div>
+      <div id="setting">
+        <button class="btn-tool" onclick="inspace()" id="btn-inspace">xem trước</button>
+        <input type="file" id="folderInput" webkitdirectory directory multiple hidden />
+        <button onclick="document.getElementById('folderInput').click()" class="btn-tool">📂 nạp test cho bài này</button>
+
+        <script>
+            document.getElementById('folderInput').addEventListener('change', (e) => {
+                const files = e.target.files;
+                if (files.length > 0) {
+                alert(`Đã chọn ${files.length} tệp trong thư mục: ${files[0].webkitRelativePath.split('/')[0]}`);
+            }
+        });
+        </script>
+        
+        <label for="point" class="btn-tool">điểm mỗi câu 
+           <input type="text" id="point" value="1">
+        </label>
+
+        <label for="time" class="btn-tool">thời gian 
+          <select name="" id="time" >
+            <option value="1">1s</option>
+            <option value="2">2s</option>
+            <option value="3">3s</option>
+          </select>
+         </label>
+
+         <label class="btn-tool">
+            chủ đề
+            <select name="topic" id="topic-select">
+              <option value="mang1chieu">Mảng 1 chiều</option>
+              <option value="xaukytu">Xâu ký tự</option>
+              <option value="sohoc">Số học</option>
+              <option value="dequy">Đệ quy - Quay lui</option>
+              <option value="thamlam">Tham lam</option>
+              <option value="nhiphan">Tìm kiếm nhị phân</option>
+              <option value="mang2chieu">Mảng 2 chiều</option>
+              <option value="qhd">Quy hoạch động (QHĐ)</option>
+              <option value="dothi">Đồ thị</option>
+              <option value="cay">Cây</option>
+              <option value="dsu">DSU, Fenwick Tree</option>
+              <option value="kythuatdacbiet">Kỹ thuật đặc biệt</option>
+              <option value="luyentap">Luyện tập</option>
+            </select>
+          </label>
+
+       
+        <!-- <button onclick="exportHTML()" class="btn-tool">Xuất HTML</button> -->
+        <button class="btn-tool" onclick="submitData()">Đăng bài tập 📄</button>
+
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function execCmd(command) {
+      document.execCommand(command, false, null);
+    }
+
+    function insertText(text) {
+      const sel = window.getSelection();
+      if (!sel.rangeCount) return;
+      const range = sel.getRangeAt(0);
+      range.deleteContents();
+      range.insertNode(document.createTextNode(text));
+      range.collapse(false);
+      sel.removeAllRanges();
+      sel.addRange(range);
+    }
+
+    function add(id) {
+      let q = document.createElement('tr')
+      const chill = `
+          <td><textarea placeholder="Input"></textarea></td>
+          <td><textarea placeholder="Output"></textarea></td>
+          <td><button class="delete-btn" onclick="removeRow(this)">X</button></td>
+        </tr>
+      `;
+      q.innerHTML = chill ;
+      document.getElementById(id).appendChild(q);
+    }
+
+    function removeRow(btn) {
+      btn.closest('tr').remove();
+    }
+
+    function removeElement(btn) {
+      btn.parentElement.remove();
+    }
+
+    function add_tool(section) {
+      if ( section === 'body') {
+        const container = document.getElementById(section);
+        container.innerHTML += `
+          <div class="row-group">
+            <div class="toolbar">
+              <button onclick="execCmd('bold')"><b>B</b></button>
+              <button onclick="execCmd('italic')"><i>I</i></button>
+              <button onclick="execCmd('underline')"><u>U</u></button>
+              <button onclick="insertText(' ≤ ')">≤</button>
+              <button onclick="insertText(' ≥ ')">≥</button>
+              <button onclick="insertText(' ≠ ')">≠</button>
+              <button onclick="insertText(' ∑ ')">∑</button>
+            </div>
+            <div class="editor" contenteditable="true">Nhập nội dung tại đây...</div>
+            <button class="delete-btn" onclick="removeElement(this)">X</button>
+          </div>`;
+      } else if (section === 'hehe') {
+        add('hehe');
+      }else if ( section === 'header' ) 
+      {
+            const container = document.getElementById(section);
+            const div = document.createElement("div");
+            div.className = "name-problem";
+
+            const input = document.createElement("input");
+            input.type = "text";
+            input.placeholder = "Viết tiêu đề";
+
+            const btn = document.createElement("button");
+            btn.className = "delete-btn";
+            btn.textContent = "X";
+            btn.onclick = function () {
+                div.remove();
+            };
+
+            div.appendChild(input);
+            div.appendChild(btn);
+
+            container.appendChild(div);
+      }
+    
+    }
+  </script>
+    <script>
+      let e = document.getElementById("problem-edit") ;
+      let i = document.getElementById("problem-inspace") ;
+      function inspace() {
+        // 1. Tiêu đề
+        let check = window.getComputedStyle(i).display === 'none' ;
+        if ( check )
+        {
+            let titleHTML = Array.from(
+              document.querySelectorAll('#header .name-problem input')
+            ).map(input => `<h2 style="text-align:center;">${input.value}</h2>`)
+            .join('\n');
+            document.getElementById("header-inspace").innerHTML = titleHTML;
+
+            // 2. Nội dung câu hỏi
+            let bodyHTML = Array.from(
+              document.querySelectorAll('#body .editor')
+            ).map(editor => `<p>• ${editor.innerHTML.trim()}</p>`)
+            .join('\n');
+            document.getElementById("body-inspace").innerHTML = bodyHTML;
+
+
+            let tableHTML = ``;
+
+            document.querySelectorAll('#hehe tr').forEach(tr => {
+              const [taIn, taOut] = tr.querySelectorAll('textarea');
+              if (taIn && taOut) {
+                tableHTML += `<tr><td>${taIn.value}</td><td>${taOut.value}</td></tr>\n`;
+              }
+            });
+            document.getElementById("hehe-inspace").innerHTML = tableHTML;
+            document.getElementById("btn-inspace").innerHTML = 'thiết kế' ;
+            e.style.display = 'none' ;
+            i.style.display = 'block' ; 
+        }
+        else 
+        {
+            document.getElementById("btn-inspace").innerHTML = 'xem trước' ;
+            i.style.display = 'none' ;
+            e.style.display = 'block' ; 
+        }
+    }
+
+    </script>
+    <script>
+      let new_id = Date.now().toString(36) + Math.random().toString(36).substr(2, 9);
+      document.getElementById("code_problem").innerHTML += new_id ;
+      async function submitData() {
+          
+          // 1. Thu thập tiêu đề
+          const titles = Array.from(document.querySelectorAll('#header .name-problem input'))
+              .map(input => input.value);
+
+          // 2. Thu thập nội dung câu hỏi
+          const bodies = Array.from(document.querySelectorAll('#body .editor'))
+              .map(editor => editor.innerHTML.trim());
+
+          // 3. Thu thập ví dụ input-output
+          const examples = Array.from(document.querySelectorAll('#hehe tr')).map(tr => {
+              const [taIn, taOut] = tr.querySelectorAll('textarea');
+              return taIn && taOut ? { input: taIn.value, output: taOut.value } : null;
+          }).filter(Boolean);
+
+          // 4. Thời gian giới hạn
+          const timeLimit = document.getElementById('time').value;
+
+          // 5. Thu thập các file test
+          const files = document.getElementById('folderInput').files;
+          const testData = {};
+          for (const file of files) {
+              const pathParts = file.webkitRelativePath.split("/");
+              if (pathParts.length < 2) continue;
+
+              const folder = pathParts[pathParts.length - 2]; // test01
+              const filename = pathParts[pathParts.length - 1]; // name.inp
+
+              const content = await file.text();
+
+              if (!testData[folder]) testData[folder] = {};
+
+              const lowerFilename = filename.toLowerCase();
+
+              if (lowerFilename.endsWith(".inp")) {
+                  testData[folder].input = content;
+              } else if (lowerFilename.endsWith(".out")) {
+                  testData[folder].output = content;
+              }
+          }
+
+          // 6. Gộp tất cả thành 1 payload JSON
+          const payload = {
+              new_id,
+              titles,
+              bodies,
+              examples,
+              timeLimit,
+              point: document.getElementById("point").value,
+              tests: testData,
+              topic: document.getElementById("topic-select").value
+          };
+
+          // 7. Gửi dữ liệu về Flask
+          fetch('/api/post_exercise', {
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/json'
+              },
+              body: JSON.stringify(payload)
+          })
+          .then(res => res.json())
+          .then(data => {
+              alert('✅ Gửi thành công: ' + data.message);
+              window.location.href = '/';
+          })
+          .catch(err => {
+              console.error('❌ Lỗi khi gửi dữ liệu:', err);
+              alert('❌ Gửi thất bại!');
+          });
+      }
+    </script>
+
+</body>
+</html>

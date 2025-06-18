@@ -1,0 +1,241 @@
+html, body {
+    padding: 0;
+    margin: 0;
+    width: 100%;
+    height: 100%;
+}
+
+/* ======================= header =======================*/
+#vudzso1-header {
+    background: linear-gradient(to right, #4facfe, #00f2fe);
+    width: 100%;
+    height: 50px;
+    display: flex;
+    align-items: center;
+}
+
+#vudzso1-side-panel {
+    display: flex;
+    position: relative;
+    margin-left: 50px;
+    height: 100%;
+}
+
+.vudzso1-nav-item {
+    position: relative;
+    height: 100%;
+    width: 120px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    border-radius: 10px;
+    z-index: 1;
+}
+
+.vudzso1-nav-item:hover {
+    color: #000;
+}
+
+.vudzso1-nav-item.vudzso1-active {
+    background-color: rgba(255, 255, 255, 0.589);
+}
+
+.vudzso1-hover-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 120;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.589);
+    border-radius: 10px;
+    z-index: 0;
+    transition: all 0.3s ease;
+}
+
+#vudzso1-avatar-container {
+    height: 45px;
+    margin-right: 20px;
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+#vudzso1-avatar-container > img {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+#vudzso1-mini-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#vudzso1-mini-info > span {
+    font-size: 10px;
+}
+
+/* ======================= main =======================*/
+
+main {
+    width: 100%;
+    height: calc(100% - 90px);
+}
+
+.vudzso1-section {
+    width: 100%;
+    height: 100%;
+    display: none;
+    overflow: auto ;
+}
+
+.vudzso1-section.vudzso1-active {
+    display: flex;
+}
+
+#vudzso1-home {
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Tổng thể khung welcome */
+#vudzso1-welcome {
+    width: calc( 56% - 30px );
+    height: calc( 98% - 30px );
+    padding: 15px;
+    background-color: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2), 0 6px 20px rgba(0,0,0,0.19);
+    color: #333333;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6;
+    overflow: auto;
+}
+
+/* Tiêu đề chính */
+#vudzso1-welcome h3 {
+    font-size: 1.8rem;
+    margin-bottom: 15px;
+    color: #1976d2;
+    text-align: center;
+}
+
+/* Đoạn văn cảnh báo */
+#vudzso1-welcome p {
+    margin-top: 20px;
+    margin-bottom: 10px;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #d84315;
+}
+
+#vudzso1-welcome ul#vudzso1-rule,
+#vudzso1-welcome ul#vudzso1-warming {
+    list-style: none;
+    padding-left: 0;
+    margin-bottom: 20px;
+}
+
+#vudzso1-welcome li {
+    padding: 10px 16px;
+    background-color: #f9f9f9;
+    margin-bottom: 10px;
+    border-left: 5px solid #2196f3;
+    border-radius: 6px;
+}
+
+#vudzso1-welcome ul#vudzso1-rule li::before {
+    content: "✔️ ";
+    margin-right: 6px;
+}
+
+#vudzso1-welcome ul#vudzso1-warming li::before {
+    content: "⚠️ ";
+    margin-right: 6px;
+}
+
+#vudzso1-post-container {
+    width: calc( 46% - 30px );
+    height: calc( 98% - 30px );
+    overflow: auto;
+    padding: 15px;
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2), 0 6px 20px rgba(0,0,0,0.19);
+}
+
+.vudzso1-post {
+    max-width: 600px;
+    margin: 30px auto;
+    background-color: #c1e4e6;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2), 0 6px 20px rgba(0,0,0,0.19);
+    font-family: 'Segoe UI', Tahoma, sans-serif;
+    color: #333;
+}
+
+.vudzso1-post-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.vudzso1-post-header img {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    margin-right: 15px;
+    object-fit: cover;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.vudzso1-info .vudzso1-name {
+    font-weight: 600;
+    font-size: 1rem;
+    color: #1976d2;
+}
+
+.vudzso1-info .vudzso1-time {
+    font-size: 0.9rem;
+    color: #777;
+    margin-top: 2px;
+}
+
+.vudzso1-post-content {
+    font-size: 1rem;
+    line-height: 1.6;
+    color: #444;
+    white-space: pre-line;
+}
+
+footer {
+    width: 100%;
+    height: 40px;
+    background: linear-gradient(to right, #4facfe, #00f2fe);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#btn_back{
+    background-color: #00f2fe ;
+    margin: 10px;
+    width: 100px ;
+    height: 30px ;
+    border-radius: 10px ;
+}
+
+#vudzso1-manage-member {
+    font-family: Arial, sans-serif;
+    padding: 0 0 ; 
+    margin: 0 ;
+    width: 100% ;
+    height: 100% ;
+    overflow-y: auto ;
+    /* background-color: red ; */
+}

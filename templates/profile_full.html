@@ -1,0 +1,113 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="../static/profile_full.css">
+</head>
+<body>
+    <div id="main">
+        <div id="profile-container">
+            <div id="avatar-container">
+                <img src="./avatar" alt="" id="avatar">
+                <h1> {{ full_name }} </h1>
+                <label>{{ interest }}</label>
+                <div id="btn-item">
+                    <button class="btn-item" > <a href="/logout">đăng xuất</a></button>
+                    <button class="btn-item" > <a href="/edit_profile">chỉnh sửa thông tin</a> </button>
+                    <button class="btn-item" > <a href="/"> quay về trang chủ</a></button>
+                </div>
+            </div>
+            <div id="info-profile">
+                <div>
+                    <h2>Thông tin cá nhân </h2>
+                </div>
+                <div>
+                    <h3>Email: {{ email }} </h3>
+                    <h3>Địa chỉ: {{address}} </h3>
+                    <h3>Ngày sinh : {{ date }}</h3>
+                    <h2>
+                        Mục tiêu
+                    </h2>
+                </div>
+                <h3>{{ target }}</h3>
+            </div>
+            <div id="post-container">
+                <div id="nav-tab">
+                    <div class="nav-tab-item active" onclick="switchTab('normal-post' , this )">✏️ bài viết </div>
+                    <div class="nav-tab-item" onclick="switchTab('exercise' , this )">📗 bài tập</div>
+                    <div class="nav-tab-item" onclick="switchTab('contest' , this )">🔥 cuộc thi</div>
+                </div>
+                <div id="post-content">
+                     <div class="post-content-item active" id="normal-post">
+                         <div id="post-space">
+                            <h2>Tạo bài viết</h2>
+                            <textarea name="content" id="write-content" placeholder="Viết gì đó....."></textarea>
+                            <button class="submit" onclick="send(this)">đăng</button>
+                        </div>
+                    </div>
+                    <div class="post-content-item" id="exercise">
+                        <h2>
+                            Vì Vũ không đc thông minh lắm<br>nên mong mọi người thông cảm<br>ấn nút ở bên dưới để đến chỗ <br> Tạo bài tập
+                        </h2>
+                        <button class="btn-item"><a href="/create-exercise">Tạo bài tập</a></button>
+                    </div>
+                    <div class="post-content-item" id="contest">
+                        <h2>
+                            Vì Vũ không đc thông minh lắm<br>nên mong mọi người thông cảm<br>ấn nút ở bên dưới để đến chỗ <br> Tạo cuộc thi
+                        </h2>
+                        <button class="btn-item"><a href="/create-contest">Tạo cuộc thi</a></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    function switchTab(id, e) {
+        document.querySelectorAll('.nav-tab-item').forEach(element => {
+            element.classList.remove("active");
+        });
+        document.querySelectorAll('.post-content-item').forEach(element => {
+            element.classList.remove("active");
+        });
+        document.getElementById(id).classList.add("active");
+        e.classList.add("active");
+    }
+    
+    // Gán lại hàm để gọi từ HTML onclick
+    window.switchTab = switchTab;
+    
+});
+function send( btn ) 
+{
+    const content_post = document.getElementById("write-content").value ;
+    const today = new Date();
+    const day = String(today.getDate()).padStart(2, '0');        // Ngày
+    const month = String(today.getMonth() + 1).padStart(2, '0'); // Tháng (getMonth() bắt đầu từ 0)
+    const year = today.getFullYear();                            // Năm
+
+    const ngayThangNam = `${year}-${month}-${day}`;
+    btn.disabled = true;
+
+    fetch('/api/post', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({"content" : content_post , "time_post" : ngayThangNam })
+    })
+    .then(res => res.json())
+    .then(data => {
+        alert('✅ Gửi thành công: ' + data.message);
+        window.location.href = '/';
+    })
+    .catch(err => {
+        console.error('❌ Lỗi khi gửi dữ liệu:', err);
+        alert('❌ Gửi thất bại!');
+    });
+}
+</script>
+
+</html>

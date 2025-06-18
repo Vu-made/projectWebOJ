@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Đăng nhập</title>
+  <link rel="stylesheet" href="../static/login.css">
+</head>
+<body>
+
+  <div id="LOGO">
+    <img src="../static/logo.png" alt="">
+    <div class="spinner "></div>
+  </div>
+
+  <div id="window-right">
+    <form class="form-container" action="/submit" method="POST" id="form-container">
+    <img id="logo" src="../static/logo.png" alt="">
+
+    <label class="login-item" for="username">Tên đăng nhập:</label>
+    <input class="login-item" type="text" id="username" name="username" required value="{{ username }}" placeholder="Tên đăng nhập"/>
+
+    <label class="login-item" for="password">Nhập mật khẩu</label>
+    <input class="login-item" type="password" id="password" name="password" required value="{{ password }}" placeholder="Nhập mật khẩu" />
+
+    <div class="checkbox-group login-item" >
+      <label  for="remember">Ghi nhớ đăng nhập<input type="checkbox" id="remember" name="remember" {{ 'checked' if remember else '' }}></label>
+      <label for="hide">Hiện mật khẩu<input type="checkbox" id="hide" name="hide"></label>
+    </div>
+
+    <button class="back" type="submit" name="action" value="home" >Hãy cùng bắt đầu thôi</button>
+
+    <a class="back" href="/login">Không phải tài khoản của bạn?</a>
+
+    {% if error %}
+      <p class="error">{{ error }}</p>
+    {% endif %}
+
+    <button class="login-item" type="submit" name="action" value="login">Đăng nhập</button>
+
+    <a class="login-item" href="/register">Chưa có tài khoản? Đăng ký ngay</a>
+
+
+  </form>
+  </div>
+  <script>
+    document.getElementById('hide').addEventListener('change', function () {
+      const passwordField = document.getElementById('password');
+      passwordField.type = this.checked ? 'text' : 'password';
+    });
+
+    let command = "{{ command }}" ;
+
+    if ( command === "login" )
+    {
+        document.getElementById("form-container").classList.add("hide");
+        document.querySelectorAll('.back').forEach(el => {
+            el.style.display = 'none';
+        });
+
+        setTimeout(()=>{
+          const box = document.getElementById('LOGO');
+          const target = document.getElementById('logo');
+          const rect = target.getBoundingClientRect();
+          
+          // Lấy vị trí chính xác tính theo toàn trang
+          const x = rect.left + window.scrollX;
+          const y = rect.top + window.scrollY;
+
+          // Gán lại thuộc tính cho box
+          box.style.left = x + 'px';
+          box.style.top = y + 'px';
+          box.style.width = rect.width + 'px';
+          box.style.height = rect.height + 'px';
+      },2000) ;
+    }
+    else
+    {
+        document.getElementById("form-container").classList.add("show");
+        let img = document.getElementById("logo") ;
+        document.getElementById("LOGO").style.display = 'none' ;
+        document.querySelectorAll('.login-item').forEach(el => {
+            el.style.display = 'none';
+        });
+        img.classList.add('second');
+        img.src = '/avatar' ;
+    }
+
+
+   setTimeout(()=>{
+     document.getElementById("form-container").classList.add('show');
+     setTimeout(() => {
+        document.getElementById("LOGO").style.display='none';
+      }, 1000);
+    },3000) ;
+  </script>
+  <script>
+    document.getElementById('form-container').addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') {
+        e.preventDefault(); // chặn submit khi nhấn Enter
+      }
+    });
+  </script>
+
+</body>
+</html>

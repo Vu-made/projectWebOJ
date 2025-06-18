@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Trang tuyển Tin học</title>
+  <link rel="stylesheet" href="../static/style.css">
+</head>
+<body>
+
+  <div id="vudzso1-header"> 
+    <div id="vudzso1-side-panel" class="vudzso1-tabs">
+      <div class="vudzso1-hover-bg" id="vudzso1-hover-bg"></div>
+      <div class="vudzso1-nav-item vudzso1-active" id="vudzso1-nav-home">Trang chủ</div>
+      <div class="vudzso1-nav-item" id="vudzso1-nav-exercise">Bài tập</div>
+      <div class="vudzso1-nav-item" id="vudzso1-nav-contest">kỳ thi</div>
+      <div class="vudzso1-nav-item" id="vudzso1-nav-rank">Xếp hạng</div>
+      <div class="vudzso1-nav-item" id="vudzso1-nav-manage-member" style="display: none ;">quản lý</div>
+      <div class="vudzso1-nav-item" id="vudzso1-nav-profile">Tài khoản</div>
+    </div>
+    <div id="vudzso1-avatar-container">
+      <div id="vudzso1-mini-info">
+        <b>{{ username }}</b>
+        <span>-{{role}}-</span>
+      </div>
+      <img src="/avatar">
+    </div>
+  </div>
+
+  <main>  
+    <div class="vudzso1-section vudzso1-active" id="vudzso1-home">
+      <div id="vudzso1-welcome">
+        <h3>chào mừng các bạn đã đến với trang web</h3>
+        <p>nếu là lần đầu đến trang web hãy tuân thủ những điều bên dưới:</p>
+        <ul id="vudzso1-rule">
+          <li>chỉ có thành viên của đội tuyển được cấp phép mới có thể tạo tài khoản</li>
+          <li>không được đăng các nội dung không phù hợp</li>
+          <li>chỉ được chọn các hình ảnh phù hợp làm ảnh đại diện</li>
+        </ul>
+        <p>Chú ý:</p>
+        <ul id="vudzso1-warming">
+          <li>trong phần [cấu hình > máy chấm] "dynamic machine" chấm bài nhiều đáp án<br>hiện tại vẫn đang phát triển và chưa dùng được</li>
+          <li>không spam lung tung!</li>
+        </ul>
+      </div>
+
+      <div id="vudzso1-post-container">
+        <h3>Thông báo sẽ ở đây</h3>
+        {{ postList | safe }}
+      </div>
+    </div>
+
+    <div class="vudzso1-section" id="vudzso1-exercise">
+        <!-- {{ list_exercise | safe }}-->
+          <!-- <h2>tìm kiếm nhị phân</h2>
+          <button onclick="back_topic()" id="btn_back">← Quay lại</button>
+          <table>
+            <thead>
+                <tr>
+                  <th>tên bài</th>
+                  <th>chủ đề</th>
+                  <th>mã bài</th>
+                  <th>Hành động</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                  <td>con bò cười</td>
+                  <td>thamlam</td>
+                  <td>sadasdsadsaasdasd</td>
+                  <td><button>Xem</button></td>
+                </tr>
+            </tbody>
+          </table> -->
+          {% include "topic.html" %} 
+    </div>
+
+    <div id="vudzso1-contest" class="vudzso1-section">
+        {% include "contest.html" %}
+    </div>
+
+    <div class="vudzso1-section" id="vudzso1-rank">
+      Bảng xếp hạng hiện tại sẽ hiển thị tại đây.
+    </div>
+
+    <div class="vudzso1-section" id="vudzso1-profile">
+      {{ profile | safe }}
+    </div>
+
+
+    <div class="vudzso1-section" id="vudzso1-manage-member">
+      {% include "manage_member.html" %}
+    </div>
+  </main>
+
+  <footer>
+    <p> Đội tuyển Tin học THPT Thạch Thành III</p>
+  </footer>
+
+  <script>
+    const navItems = document.querySelectorAll('.vudzso1-nav-item');
+    const sections = document.querySelectorAll('.vudzso1-section');
+
+    navItems.forEach(item => {
+      item.addEventListener('click', () => {
+        const targetId = item.id.replace('vudzso1-nav-', 'vudzso1-');
+        sections.forEach(section => {
+          section.classList.toggle('vudzso1-active', section.id === targetId);
+        });
+        navItems.forEach(nav => nav.classList.remove('vudzso1-active'));
+        item.classList.add('vudzso1-active');
+      });
+    });
+  </script>
+
+  <script>
+    const tabs = document.querySelectorAll(".vudzso1-nav-item");
+    const hoverBg = document.getElementById("vudzso1-hover-bg");
+
+    tabs.forEach(tab => {
+      tab.addEventListener("mouseenter", (e) => {
+        const rect = tab.getBoundingClientRect();
+        const parentRect = tab.parentElement.getBoundingClientRect();
+
+        hoverBg.style.width = `${rect.width}px`;
+        hoverBg.style.left = `${rect.left - parentRect.left}px`;
+      });
+    });
+
+    document.querySelector(".vudzso1-tabs").addEventListener("mouseleave", () => {
+      hoverBg.style.width = `0`;
+    });
+
+    document.getElementById("vudzso1-nav-manage-member").click() ;    
+  </script>
+  <script>
+    const role = "{{ role }}" ;
+    if ( role === "admin"|| role === "teacher" ) 
+      document.getElementById("vudzso1-nav-manage-member").style.display = 'flex' ;
+  </script>
+</body>
+</html>

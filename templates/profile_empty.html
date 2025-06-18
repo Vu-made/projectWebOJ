@@ -1,0 +1,35 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="../static/profile_full.css">
+    <style>
+        #profile-empty{
+            margin: 100px auto auto auto ;
+            display: flex ;
+            flex-direction: column ;
+        }
+        #profile-empty>button{
+            width: 300px;
+            height: 50px;
+            margin: 0 auto ;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div id="main">
+        <div id="profile-container">
+
+            <div id="profile-empty">
+                <h3>- Bạn chưa đăng nhập , hãy đăng nhập để xem thông tin</h3>
+                <h3>- Nếu chữa có tài khoản hãy ấn đăng ký ( chú ý chỉ có thành viên của đt mới có thể đăng ký )</h3>
+                <h3>- Chỉ khi đăng nhập bạn mới có thể chấm bài</h3>
+                <button class="btn-item" onclick="window.location.href='/login'">Đăng nhập</button>
+                <button class="btn-item" onclick="window.location.href='/register'">Đăng ký</button>
+            </div>
+            
+        </div>
+    </div>
+</body>

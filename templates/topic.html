@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Danh sách chuyên đề</title>
+  <style>
+    #vudzso3-topic-page {
+      width: 100%;
+      height: 100%;
+    }
+    #vudzso3-topic-page>h2 {
+      color: #2c3e50;
+      font-size: 28px;
+      margin-bottom: 20px;
+      border-left: 5px solid #3498db;
+      padding-left: 12px;
+    }
+    #vudzso3-nav-tab-baitap {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .vudzso3-nav-tab-baitap {
+      padding: 10px 22px;
+      border: 2px solid #3498db;
+      border-radius: 8px;
+      cursor: pointer;
+      background-color: #ffffff;
+      color: #3498db;
+      font-weight: 600;
+      transition: all 0.3s ease;
+    }
+    .vudzso3-nav-tab-baitap:hover {
+      background-color: #eaf4fd;
+    }
+    .vudzso3-tab-baitap-content {
+      color: white !important;
+      width: 100%;
+      height: 100%;
+      display: none;
+    }
+    .vudzso3-active {
+      background-color: #3498db !important;
+      color: white !important;
+    }
+    .vudzso3-tab-baitap-content.vudzso3-active {
+      display: block;
+    }
+    table.vudzso3-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 16px;
+      background-color: #ffffff;
+      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.05);
+      border-radius: 6px;
+      overflow: hidden;
+    }
+    table.vudzso3-table th,
+    table.vudzso3-table td {
+      padding: 14px 18px;
+      border-bottom: 1px solid #e0e0e0;
+      color: #2c3e50;
+      border: 1px solid #dcdde1;
+      text-align: center;
+    }
+    table.vudzso3-table thead {
+      background-color: #3498db;
+      color: white;
+    }
+    td.vudzso3-solved-count {
+      text-align: center;
+      font-weight: bold;
+    }
+    #vudzso3-btn-back {
+      margin: 16px 0;
+      padding: 10px 20px;
+      background-color: #3498db;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: background-color 0.3s ease;
+    }
+    #vudzso3-btn-back:hover {
+      background-color: #2a7cbf;
+    }
+    #vudzso3-topic-list {
+      width: 100%;
+    }
+    .vudzso3-button {
+      padding: 8px 14px;
+      background-color: #3498db;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: background-color 0.25s ease;
+    }
+    .vudzso3-button:hover {
+      background-color: #27ae60;
+    }
+  </style>
+</head>
+<body>
+
+<div id="vudzso3-topic-page">
+  <h2>📘 Danh sách chuyên đề thuật toán</h2>
+
+  <div id="vudzso3-topic-list">
+    <div id="vudzso3-nav-tab-baitap">
+      <div id="vudzso3-nav-normal" class="vudzso3-nav-tab-baitap vudzso3-active" onclick="vudzso3_switchTab('normal')">🧩 cơ bản</div>
+      <div id="vudzso3-nav-hard" class="vudzso3-nav-tab-baitap" onclick="vudzso3_switchTab('hard')">🧠 nâng cao</div>
+      <div id="vudzso3-nav-all" class="vudzso3-nav-tab-baitap" onclick="vudzso3_switchTab('all')">✏️ tổng hợp</div>
+    </div>
+
+    <!-- Cơ bản -->
+    <div id="vudzso3-normal" class="vudzso3-tab-baitap-content vudzso3-active">
+      <table class="vudzso3-table">
+        <thead>
+          <tr><th>Chuyên đề</th><th>Mô tả</th><th>Kỹ thuật</th><th>Số bài</th><th>Hành động</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Mảng 1 chiều</td><td>Xử lý dãy số</td><td>Array, Prefix Sum</td><td class="vudzso3-solved-count">{{ topic_counts.mang1chieu }}</td><td><button class="vudzso3-button" onclick="vudzso3_loadTopic('mang1chieu')">Xem</button></td></tr>
+          <tr><td>Xâu ký tự</td><td>Xử lý chuỗi</td><td>String, Hashing</td><td class="vudzso3-solved-count">{{ topic_counts.xaukytu }}</td><td><button class="vudzso3-button" onclick="vudzso3_loadTopic('xaukytu')">Xem</button></td></tr>
+          <tr><td>Số học</td><td>Chia hết, số nguyên tố</td><td>Modulo, GCD</td><td class="vudzso3-solved-count">{{ topic_counts.sohoc }}</td><td><button class="vudzso3-button" onclick="vudzso3_loadTopic('sohoc')">Xem</button></td></tr>
+          <tr><td>Đệ quy - Quay lui</td><td>Duyệt hết các TH</td><td>Recursion, Backtrack</td><td class="vudzso3-solved-count">{{ topic_counts.dequy }}</td><td><button class="vudzso3-button" onclick="vudzso3_loadTopic('dequy')">Xem</button></td></tr>
+          <tr><td>Tham lam</td><td>Chọn tốt từng bước</td><td>Greedy</td><td class="vudzso3-solved-count">{{ topic_counts.thamlam }}</td><td><button class="vudzso3-button" onclick="vudzso3_loadTopic('thamlam')">Xem</button></td></tr>
+          <tr><td>Tìm kiếm nhị phân</td><td>Tìm đáp án</td><td>Binary Search</td><td class="vudzso3-solved-count">{{ topic_counts.nhiphan }}</td><td><button class="vudzso3-button" onclick="vudzso3_loadTopic('nhiphan')">Xem</button></td></tr>
+          <tr><td>Đếm phân phối</td><td>Đếm tần suất</td><td>HashMap, Count</td><td class="vudzso3-solved-count">{{ topic_counts.demphanphoi }}</td><td><button class="vudzso3-button" onclick="vudzso3_loadTopic('demphanphoi')">Xem</button></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Nâng cao -->
+    <div id="vudzso3-hard" class="vudzso3-tab-baitap-content">
+      <table class="vudzso3-table">
+        <thead>
+          <tr><th>Chuyên đề</th><th>Mô tả</th><th>Kỹ thuật</th><th>Số bài</th><th>Hành động</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Mảng 2 chiều</td><td>Xử lý ma trận</td><td>2D Array</td><td class="vudzso3-solved-count">{{ topic_counts.mang2chieu }}</td><td><button class="vudzso3-button" onclick="vudzso3_loadTopic('mang2chieu')">Xem</button></td></tr>
+          <tr><td>Quy hoạch động</td><td>Tối ưu hoá</td><td>DP, Memo</td><td class="vudzso3-solved-count">{{ topic_counts.qhd }}</td><td><button class="vudzso3-button" onclick="vudzso3_loadTopic('qhd')">Xem</button></td></tr>
+          <tr><td>Đồ thị</td><td>Đường đi, liên thông</td><td>DFS, BFS</td><td class="vudzso3-solved-count">{{ topic_counts.dothi }}</td><td><button class="vudzso3-button" onclick="vudzso3_loadTopic('dothi')">Xem</button></td></tr>
+          <tr><td>Cây</td><td>DFS trên cây</td><td>Tree, LCA</td><td class="vudzso3-solved-count">{{ topic_counts.cay }}</td><td><button class="vudzso3-button" onclick="vudzso3_loadTopic('cay')">Xem</button></td></tr>
+          <tr><td>DSU, Fenwick Tree</td><td>DS nâng cao</td><td>DSU, BIT</td><td class="vudzso3-solved-count">{{ topic_counts.dsu }}</td><td><button class="vudzso3-button" onclick="vudzso3_loadTopic('dsu')">Xem</button></td></tr>
+          <tr><td>Kỹ thuật đặc biệt</td><td>Sliding Window</td><td>2 Pointers</td><td class="vudzso3-solved-count">{{ topic_counts.kythuatdacbiet }}</td><td><button class="vudzso3-button" onclick="vudzso3_loadTopic('kythuatdacbiet')">Xem</button></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Tổng hợp -->
+    <div id="vudzso3-all" class="vudzso3-tab-baitap-content">
+      <table class="vudzso3-table">
+        <thead>
+          <tr><th>Chuyên đề</th><th>Mô tả</th><th>Kỹ thuật</th><th>Số bài</th><th>Hành động</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Luyện tập</td><td>Bài tổng hợp</td><td>Tổng hợp</td><td class="vudzso3-solved-count">{{ topic_counts.luyentap }}</td><td><button class="vudzso3-button" onclick="vudzso3_loadTopic('luyentap')">Xem</button></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Chi tiết -->
+  <div id="vudzso3-topic-detail" style="display: none;">
+    <button class="vudzso3-button" id="vudzso3-btn-back" onclick="vudzso3_goBack()">← Quay lại</button>
+    <table class="vudzso3-table">
+      <thead>
+        <tr><th>Tên bài</th><th>Mã bài</th><th>Chủ đề</th><th>Hành động</th></tr>
+      </thead>
+      <tbody id="vudzso3-topic-content">
+        <!-- Nội dung bài sẽ được load -->
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+function vudzso3_loadTopic(topicId) {
+  document.getElementById('vudzso3-topic-content').innerHTML = "<p>⏳ Đang tải chuyên đề...</p>";
+  document.getElementById('vudzso3-topic-list').style.display = 'none';
+  document.getElementById('vudzso3-topic-detail').style.display = 'block';
+
+  fetch(`/topic/${topicId}`)
+    .then(res => {
+      if (!res.ok) throw new Error("Không tìm thấy chuyên đề!");
+      return res.text();
+    })
+    .then(html => {
+      document.getElementById('vudzso3-topic-content').innerHTML = html;
+    })
+    .catch(err => {
+      document.getElementById('vudzso3-topic-content').innerHTML = `<p style="color:red;">❌ ${err.message}</p>`;
+    });
+}
+
+function vudzso3_goBack() {
+  document.getElementById('vudzso3-topic-detail').style.display = 'none';
+  document.getElementById('vudzso3-topic-content').innerHTML = '';
+  document.getElementById('vudzso3-topic-list').style.display = 'block';
+}
+
+function vudzso3_switchTab(tab) {
+  ['normal', 'hard', 'all'].forEach(t => {
+    document.getElementById(`vudzso3-${t}`).classList.remove('vudzso3-active');
+    document.getElementById(`vudzso3-nav-${t}`).classList.remove('vudzso3-active');
+  });
+  document.getElementById(`vudzso3-${tab}`).classList.add('vudzso3-active');
+  document.getElementById(`vudzso3-nav-${tab}`).classList.add('vudzso3-active');
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Bài Tập</title>
+  <link rel="stylesheet" href="../static/render_exercise.css">  
+  <style>
+
+  </style>
+</head>
+<body>
+  <main>
+    <div id="problem-inspace">
+      <div id="header-inspace"></div>
+      <div id="body-inspace"></div>
+      <div id="ex-inspace">
+        <table border="1">
+          <thead>
+            <tr>
+              <td>Input</td>
+              <td>Output</td>
+            </tr>
+          </thead>
+          <tbody id="hehe-inspace"></tbody>
+        </table>
+      </div>
+    </div>
+    <div id="tool">
+      <p style="display: flex; align-items: center;">
+          mã bài tập : <span id="code_problem" style="margin-left: 5px;">{{ id }}</span>
+      </p>
+       <button class="btn-tool" onclick="window.location.href='/submit-exercise/{{id}}'">Gửi bài giải</button>
+       <a href="/">bài nộp của tôi</a>
+       <a href="/">quay lại trang chủ</a>
+       <div id="info">
+          <p id="point">Điểm: </p>
+          <p id="timelimit">Giới hạn thời gian: </p>
+          <p>Input : stdin </p>
+          <p>Output: stdout</p>
+       </div>
+       <div id="author">
+          <p id="author-name">Tác giả : </p>
+       </div>
+    </div>
+    
+  </main>
+
+</body>
+<script>
+    const data = {} ;
+    let id = document.getElementById("code_problem").innerHTML ;
+
+    fetch('/api/render_exercise',{
+        method : 'POST',
+        headers : {
+            'Content-Type': 'application/json'
+        },
+        body : JSON.stringify({ id : id })
+    })
+    .then(response => response.json())
+    .then(data => {
+        let titles = document.getElementById("header-inspace") ;
+        data["titles"].forEach(i => {
+            titles.innerHTML += `<h2>${i}</h2>`
+        });
+        let bodies = document.getElementById('body-inspace') ;
+        data["bodies"].forEach(i => {
+            bodies.innerHTML += `<p>• ${i}</p>`
+        });
+        let examples = document.getElementById('hehe-inspace') ;
+        data["examples"].forEach(i =>{
+            examples.innerHTML += `
+                <tr>
+                    <td>${i["input"]}</td>
+                    <td>${i["output"]}</td>
+                </tr>
+            `
+        });
+        document.getElementById('point').innerHTML += `${data["point"]} (IO)` ;
+        document.getElementById("timelimit").innerHTML +=  `${data["time_limit"]} (s)` ;
+        document.getElementById("author-name").innerHTML += `${data["author"]}`;
+        console.log(data)
+    })
+    .catch(error => console.error('Lỗi:', error))
+
+</script>
+</html>

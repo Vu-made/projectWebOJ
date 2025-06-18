@@ -1,0 +1,183 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>chấm bài</title>
+    <link rel="stylesheet" href="../static/submit.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.32.3/ace.js"></script>
+</head>
+<body>
+    <div id="window-left">
+   
+        <div id="editor"></div>
+    </div>
+    <div id="window-right">
+        <div id="nav-tab">
+            <div class="tab-item active" id="nav-setting" onclick="switchTAB('setting')">cấu hình  </div>
+            <div class="tab-item" id="nav-result" onclick="switchTAB('result')">kết quả <div class="loader" id="loader"></div> </div>
+        </div>
+        <div id="tab-content">
+            <div class="tab-item-content active" id="setting">
+                <label style="margin: 10px auto 0 auto ;" id="status-text">Chấm Bài</label>
+                <div id="tool-container">
+                     <label for="code_exercise">
+                         mã bài : 
+                        <input type="text" id="code_exercise" value="{{ code_exercise }}">
+                    </label>
+                    <label for="program-language-option" id="program-language">
+                        Ngôn Ngữ : 
+                        <select name="" id="program-language-option">
+                            <option value="c_cpp">C++</option>
+                            <option value="python">Python</option>
+                        </select>
+                    </label>
+                    <label for="machine-option" id="machine">
+                        máy chấm :
+                        <select name="" id="machine-option">
+                            <option value="normal">normal machine</option>
+                            <option value="dynamic">dynamic machine</option>
+                        </select>
+                    </label>
+                    <button class="btn-item" onclick="submit(this)">Chấm</button>
+                </div>
+               
+            </div>
+            <div class="tab-item-content" id="result"> 
+                <table border="1">
+                    <thead>
+                        <tr>
+                            <th>Test</th>
+                            <th>Kết quả</th>
+                            <th>thời gian</th>
+                            <th>bộ nhớ</th>
+                        </tr>
+                    </thead>
+                    <tbody id="ans">
+                        <!-- <tr>
+                            <td>1</td>
+                            <td>AC ( runtime error )</td>
+                            <td>0.123s</td>
+                            <td>2mb</td>
+                        </tr> -->
+                        <!-- {{ ListResult | safe }} -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</body>
+<script>
+    const editor = ace.edit("editor") ;
+    // editor.setTheme("ace/theme/monokai");
+    editor.setShowPrintMargin(false) ;
+    editor.setOptions({
+        fontSize: "15pt"
+    })
+    editor.session.setMode("ace/mode/c_cpp") ;
+    editor.setValue(`#include<bits/stdc++.h>\n\nusing namespace std;\n\nint main()\n{\n   cout << "hello world!";\n   return 0;\n}`,-1)
+</script>
+<script>
+    function switchTAB( id ) {
+        document.querySelectorAll('.tab-item').forEach(el =>{
+            el.classList.remove("active") ;
+        })
+        document.querySelectorAll('.tab-item-content').forEach( el => {
+            el.classList.remove("active") ;
+        });
+        document.getElementById(id).classList.add("active") ;
+        document.getElementById("nav-"+id).classList.add("active") ;
+    }
+   
+    document.getElementById("program-language-option").addEventListener('change' , function(){
+        editor.session.setMode(`ace/mode/${this.value}`) ;
+        if ( this.value == "python" )
+            editor.setValue("print('hello world!')",-1) ;
+        else
+            editor.setValue(`#include<bits/stdc++.h>\n\nusing namespace std;\n\nint main()\n{\n   cout << "hello world!";\n   return 0;\n}`,-1)
+    });
+
+    function render_result(result) {
+        const tbody = document.getElementById("ans");
+        tbody.innerHTML = ''; // Clear old results
+
+        if (typeof result === 'string') {
+            try {
+                result = JSON.parse(result);
+            } catch (e) {
+                console.error("Lỗi JSON:", e);
+                return;
+            }
+        }
+        result.forEach(item => {
+            const status = item.status.toLowerCase(); // "wa", "ac", ...
+            const row = `
+                <tr>
+                    <td>${item.name}</td>
+                    <td class="${status}">${item.status}</td>
+                    <td>${item.time}s</td>
+                    <td>${item.memory}</td>
+                </tr>
+            `;
+            tbody.innerHTML += row;
+        });
+    }
+
+    let status_text = document.getElementById("status-text") ;
+
+    function submit( btn ) 
+    {
+        const content = editor.getValue();
+        const machine = document.getElementById("machine-option").value ;
+        const lang = document.getElementById("program-language-option").value ;
+        const code_exercise = document.getElementById("code_exercise").value ;
+
+        const data = { 
+            "content" : content,
+            "machine" : machine,
+            "lang" : lang,
+            "code_exercise" : code_exercise
+        } ;
+        fetch('/api/submit_exercise', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        })
+        .then(res => res.json())
+        .then(data => {
+            const job_id = data.job_id ;
+            console.log ( "gửi thành công đg chấm")
+            document.getElementById("loader").style.display = "block" ;
+            btn.disabled = true ;
+            const interval = setInterval(() => {
+                fetch(`/result/${job_id}`)
+                    .then(res => res.json())
+                    .then(status => {
+                        if (status.status === "done") {
+                            clearInterval(interval);
+                            // console.log("✅ Result:", status.result);
+                            document.getElementById("loader").style.display = "none" ;
+                            render_result ( status.result )
+                            switchTAB("result") ;
+                            status_text.innerHTML = "Xong!" ;
+                            btn.disabled = false 
+                        } else if (status.status === "failed") {
+                            clearInterval(interval);
+                            alert("chấm thất bại");
+                            document.getElementById("loader").style.display = "none" ;
+                        } else {
+                            console.log("⏳ Waiting...");
+                            status_text.innerHTML = "⏳ đợi tý đang chấm" ;
+                        }
+                    });
+            }, 1000);
+            // window.location.href = '/';
+        })
+        .catch(err => {
+            console.error('❌ Lỗi khi gửi dữ liệu:', err);
+            alert('❌ Gửi thất bại!');
+        });
+    }
+</script>
+</html>
