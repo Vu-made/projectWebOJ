@@ -34,6 +34,7 @@
        <a href="/">bài nộp của tôi</a>
        <a href="/">quay lại trang chủ</a>
        <div id="info">
+          <p id="topic">Chủ đề : </p>
           <p id="point">Điểm: </p>
           <p id="timelimit">Giới hạn thời gian: </p>
           <p>Input : stdin </p>
@@ -80,6 +81,7 @@
         document.getElementById('point').innerHTML += `${data["point"]} (IO)` ;
         document.getElementById("timelimit").innerHTML +=  `${data["time_limit"]} (s)` ;
         document.getElementById("author-name").innerHTML += `${data["author"]}`;
+        document.getElementById("topic").innerHTML += data["topic"] ;
         console.log(data)
     })
     .catch(error => console.error('Lỗi:', error))

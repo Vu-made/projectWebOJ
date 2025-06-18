@@ -18,7 +18,7 @@
         </div>
         <div id="tab-content">
             <div class="tab-item-content active" id="setting">
-                <label style="margin: 10px auto 0 auto ;" id="status-text">Chấm Bài</label>
+                <p style="margin: 10px auto 0 auto ;" id="status-text">Chấm Bài</p>
                 <div id="tool-container">
                      <label for="code_exercise">
                          mã bài : 
@@ -109,16 +109,19 @@
             }
         }
         result.forEach(item => {
-            const status = item.status.toLowerCase(); // "wa", "ac", ...
-            const row = `
-                <tr>
-                    <td>${item.name}</td>
-                    <td class="${status}">${item.status}</td>
-                    <td>${item.time}s</td>
-                    <td>${item.memory}</td>
-                </tr>
-            `;
-            tbody.innerHTML += row;
+            if ( "name" in item )
+            {
+                const status = item.status.toLowerCase(); // "wa", "ac", ...
+                const row = `
+                    <tr>
+                        <td>${item.name}</td>
+                        <td class="${status}">${item.status}</td>
+                        <td>${item.time}s</td>
+                        <td>${item.memory}</td>
+                    </tr>
+                `;
+                tbody.innerHTML = row + tbody.innerHTML ;
+            }
         });
     }
 

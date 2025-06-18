@@ -67,6 +67,15 @@ async def init_db():
                 );
             ''')
 
+            await cur.execute('''
+                CREATE TABLE IF NOT EXISTS solved_exercise( 
+                    username VARCHAR(225),
+                    content TEXT,
+                    topic TEXT,
+                    FOREIGN KEY ( username ) REFERENCES account(username) ON DELETE CASCADE 
+                );
+            ''')
+
 # ======================== DB UTILS =========================
 async def execute(query, args=None, fetch=False, one=False):
     try:
@@ -256,8 +265,10 @@ async def render_exercise(id):
 @app.route('/api/render_exercise', methods=['POST'])
 async def get_info_exercise():
     data = await request.get_json()
-    row = await execute("SELECT exercise FROM meta WHERE code_exercise=%s", (data.get("id"),), fetch=True, one=True)
-    return jsonify(json.loads(row[0]))
+    row = await execute("SELECT exercise,topic FROM meta WHERE code_exercise=%s", (data.get("id"),), fetch=True, one=True)
+    exercise = json.loads(row[0])
+    exercise["topic"] = row[1]
+    return jsonify( exercise )
 
 @app.route('/api/post_exercise', methods=['POST'])
 async def handle_submission():
@@ -302,20 +313,28 @@ async def go_submit_exercise( id ):
 async def submit_exercise() :
     data = await request.get_json()
     # print(json.dumps(data, indent=4, ensure_ascii=False))
-    row = await execute ( "SELECT testcase FROM meta WHERE code_exercise=%s", data.get("code_exercise","") , one=True , fetch=True )
-    if row and row[0] :
-        job = queue.enqueue( judge_code , data.get("content","") , data.get( "lang" , "c_cpp" ) , json.loads(row[0]) )
+    row = await execute ( "SELECT testcase,topic FROM meta WHERE code_exercise=%s", data.get("code_exercise","") , one=True , fetch=True )
+    if row and row[0] and row[1] :
+        data [ "topic" ] = row[1]
+        data ["username"] = session.get("username","")
+        job = queue.enqueue( judge_code , data , json.loads(row[0]) )
         # print ( json.dumps( json.loads(row[0]), indent=4 , ensure_ascii=False ) )
         return jsonify({"message": "nhận thành công", "job_id": job.get_id()})
     else : 
         return jsonify ( { "message" : "không có bài"})
 
 @app.route("/result/<job_id>")
-def result(job_id):
+async def result(job_id):
     from rq.job import Job
     job = Job.fetch(job_id, connection=Redis())
     if job.is_finished:
-        # print ( job.result )
+        for item in json.loads(job.result) : 
+            if "pass" in item and item["pass"] :
+                await execute ("""
+                        INSERT INTO solved_exercise ( username , content , topic )
+                        VALUES ( %s , %s , %s )
+                    """, ( item["username"] , json.dumps(item["content"]) , item["topic"] ))
+                break 
         return jsonify({"status": "done", "result": job.result})
     elif job.is_failed:
         return jsonify({"status": "failed"})
@@ -500,6 +519,3 @@ if __name__ == "__main__":
         await init_db()
         await app.run_task(debug=True, port=5000)
     asyncio.run(start())
-
-#quanh xinh gai
-#vudz
