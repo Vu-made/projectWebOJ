@@ -71,8 +71,9 @@ async def init_db():
                 CREATE TABLE IF NOT EXISTS solved_exercise( 
                     username VARCHAR(225),
                     content TEXT,
-                    code_exercise TEXT,
+                    code_exercise VARCHAR(100),
                     type TEXT,
+                    PRIMARY KEY ( username , code_exercise ),
                     FOREIGN KEY ( username ) REFERENCES account(username) ON DELETE CASCADE 
                 );
             ''')
@@ -342,7 +343,7 @@ async def result(job_id):
         for item in json.loads(job.result) : 
             if "username" in item :
                 await execute ("""
-                        INSERT INTO solved_exercise ( username , content , code_exercise , type )
+                        INSERT IGNORE INTO solved_exercise ( username , content , code_exercise , type )
                         VALUES ( %s , %s , %s , %s )
                     """, ( item["username"] , json.dumps(item["content"]) , item["code_exercise"] , ( "O" if item["pass"] else "X" ) ) )
                 if item["pass"] : 
@@ -350,6 +351,9 @@ async def result(job_id):
                         INSERT IGNORE INTO solved_exercise_pass ( username , code_exercise )
                         VALUES ( %s , %s )
                     """, ( item["username"] , item["code_exercise" ] ) )
+                    await execute ("""
+                        UPDATE solved_exercise SET `type`="O" WHERE code_exercise=%s ;
+                    """ , ( item["code_exercise"], ) )
         
         return jsonify({"status": "done", "result": job.result})
     elif job.is_failed:
@@ -535,7 +539,8 @@ async def get_problem_list_html( username ) :
         SELECT meta.code_exercise AS code_exercise ,
             meta.exercise AS exercise,
             solved_exercise.username AS username,
-            solved_exercise.`type` AS `type`
+            solved_exercise.`type` AS `type`,
+            meta.topic AS topic
         FROM solved_exercise
         JOIN meta ON meta.code_exercise = solved_exercise.code_exercise ;
     """
@@ -545,10 +550,10 @@ async def get_problem_list_html( username ) :
             if item[2] == username :
                 data = json.loads(item[1])
                 problem = f"""
-                    <tr>
+                    <tr class="{item[4]} topic">
                         <td>{ data["titles"] }</td>
                         <td class="{ "correct" if item[3] == "O" else "not-correct"}">
-                            <b>{ "đúng" if item[3]=="O" else "không đúng"}</b>
+                            <b >{ "đúng" if item[3]=="O" else "không đúng"}</b>
                         </td>
                         <td><button onclick="window.location.href='/render_exercise/{item[0]}'">xem</button></td>
                     </tr>

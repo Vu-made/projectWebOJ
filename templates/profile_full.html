@@ -13,6 +13,7 @@
                 <h1> {{ full_name }} </h1>
                 <label>{{ interest }}</label>
                 <div id="btn-item">
+                    <button class="btn-item"><a href="/create-exercise">Tạo bài tập</a></button>
                     <button class="btn-item" > <a href="/logout">đăng xuất</a></button>
                     <button class="btn-item" > <a href="/edit_profile">chỉnh sửa thông tin</a> </button>
                     <button class="btn-item" > <a href="/"> quay về trang chủ</a></button>
@@ -48,7 +49,25 @@
                     </div>
                     <div class="post-content-item" id="exercise">
                         <div class="watch-space">
-                            <h2>Lịch sử nộp bài <button class="btn-item-tab"><a href="/create-exercise">Tạo bài tập</a></button></h2>
+                            <h2>Lịch sử nộp bài
+                                <select name="" id="search-exercise-with-topic">
+                                    <option value="all">tất cả</option>
+                                    <option value="mang1chieu">Mảng 1 chiều</option>
+                                    <option value="xaukytu">Xâu ký tự</option>
+                                    <option value="sohoc">Số học</option>
+                                    <option value="dequy">Đệ quy - Quay lui</option>
+                                    <option value="thamlam">Tham lam</option>
+                                    <option value="nhiphan">Tìm kiếm nhị phân</option>
+                                    <option value="demphanphoi">Đếm phân phối</option>
+                                    <option value="mang2chieu">Mảng 2 chiều</option>
+                                    <option value="qhd">Quy hoạch động</option>
+                                    <option value="dothi">Đồ thị</option>
+                                    <option value="cay">Cây</option>
+                                    <option value="dsu">DSU, Fenwick Tree</option>
+                                    <option value="kythuatdacbiet">Kỹ thuật đặc biệt</option>
+                                    <option value="luyentap">Luyện tập</option>
+                                </select>
+                            </h2>
                             <table border="1px">
                                 <thead>
                                     <tr>
@@ -116,5 +135,22 @@ function send( btn )
     });
 }
 </script>
+<script>
+    document.getElementById("search-exercise-with-topic").addEventListener("change", function() {
+        const selectedTopic = this.value;
+        if (selectedTopic === "all") {
+            document.querySelectorAll(".topic").forEach(element => {
+                element.style.display = "table-row"; // Hiển thị tất cả các phần tử có class topic
+            });
+            return;
+        }
+        document.querySelectorAll(".topic").forEach(element => {
+            element.style.display = "none"; // Ẩn tất cả các phần tử có class topic
+        });
+        document.querySelectorAll(`.${selectedTopic}`).forEach(element => {
+            element.style.display = "table-row"; // Hiển thị các phần tử có class topic tương ứng
+        });
+    });
 
+</script>
 </html>
