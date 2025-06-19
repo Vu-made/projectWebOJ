@@ -365,6 +365,13 @@ async def result(job_id):
 async def topic_detail(topic_name):
     List_exercise = await execute("SELECT * FROM meta WHERE topic=%s", (topic_name,) , fetch=True)
     html = ''
+    if session :
+        username_role = await get_role(session.get("username", "")) or "member"
+        user = session.get("username", "")
+    else :
+        username_role = "member"
+        user = ""
+    
     if List_exercise:
         for i in List_exercise:
             try:
@@ -373,11 +380,25 @@ async def topic_detail(topic_name):
 
                 data = json.loads(i[1])
                 html += f"""
-                    <tr>
+                    <tr id="exercise-{i[0]}">
                         <td>{data.get("titles", "")}</td>
                         <td>{i[0]}</td>
                         <td>{i[3]}</td>
-                        <td><button class="vudzso3-button" onclick="window.location.href='/render_exercise/{i[0]}'">Xem</button></td>
+                        <td>
+                            <button class="vudzso3-button" onclick="window.location.href='/render_exercise/{i[0]}'">Xem</button>
+                            {
+                                f'''<button class="vudzso2-btn vudzso2-btn-save" onlcick="editExercise"('{i[0]}')>Sửa</button>'''
+                                if  username_role == "admin" or (
+                                    username_role == "teacher"and user == data.get("author","") 
+                                ) else ""
+                            }
+                            {
+                                f'''<button class='vudzso2-btn vudzso2-btn-delete' onclick="deleteExercise('{i[0]}')">🗑 Xóa</button>'''
+                                if  username_role == "admin" or (
+                                    username_role == "teacher"and user == data.get("author","") 
+                                ) else ""
+                            }
+                        </td>
                     </tr>
                 """
             except Exception as e:
@@ -485,6 +506,19 @@ async def update_role_user(username):
         print("Lỗi cập nhật quyền:", e)
         return "❌ Đã xảy ra lỗi khi cập nhật", 500
 
+@app.route("/delete-exercise/<code_exercise>", methods=["DELETE"])
+async def delete_exercise(code_exercise):
+    # print ( code_exercise )
+    try:
+        affected = await execute("DELETE FROM meta WHERE code_exercise = %s", (code_exercise,))
+        if affected == 0:
+            return "❌ Không tìm thấy bài tập", 404
+        await execute("DELETE FROM solved_exercise WHERE code_exercise = %s", (code_exercise,))
+        await execute("DELETE FROM solved_exercise_pass WHERE code_exercise = %s", (code_exercise,))
+        return "✅ Đã xoá bài tập thành công", 200
+    except Exception as e:
+        print("Lỗi khi xoá bài tập:", e)
+        return "❌ Đã xảy ra lỗi khi xoá bài tập", 500
 
 # ======================== AUTH =============================
 async def login():

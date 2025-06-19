@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <title>Danh sách chuyên đề</title>
   <style>
     #vudzso3-topic-page {
@@ -212,6 +213,59 @@ function vudzso3_switchTab(tab) {
   document.getElementById(`vudzso3-nav-${tab}`).classList.add('vudzso3-active');
 }
 </script>
+<script>
+    function deleteExercise(id) {
+      Swal.fire({
+        title: 'Bạn có chắc muốn xóa bài tập này?',
+        text: "Bài tập sẽ bị xóa vĩnh viễn!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Xóa',
+        cancelButtonText: 'Hủy',
 
+        // 🔥 Tắt nền mờ (background xám đằng sau)
+        backdrop: false
+      }).then((result) => {
+        if (result.isConfirmed) {
+          fetch(`/delete-exercise/${id}`, { method: 'DELETE' })
+            .then(async (response) => {
+              const contentType = response.headers.get("Content-Type") || "";
+              const isJSON = contentType.includes("application/json");
+              const data = isJSON ? await response.json() : { message: await response.text() };
+
+              if (response.ok) {
+                Swal.fire({
+                  title: '✅ Đã xóa!',
+                  text: data.message || 'Bài tập đã được xóa.',
+                  icon: 'success',
+                  backdrop: false
+                });
+                const el = document.getElementById(`exercise-${id}`);
+                if (el) el.remove();
+              } else {
+                Swal.fire({
+                  title: '❌ Lỗi!',
+                  text: data.message || 'Không thể xóa bài tập.',
+                  icon: 'error',
+                  backdrop: false
+                });
+              }
+            })
+            .catch((err) => {
+              Swal.fire({
+                title: '❌ Lỗi kết nối!',
+                text: err.message,
+                icon: 'error',
+                backdrop: false
+              });
+            });
+        }
+      });
+    }
+
+
+</script>
 </body>
 </html>
