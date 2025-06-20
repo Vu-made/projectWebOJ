@@ -5,9 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Bài Tập</title>
   <link rel="stylesheet" href="../static/render_exercise.css">  
-  <style>
+  <link rel="stylesheet" href="{{ url_for('static', filename='render_exercise.css') }}">
 
-  </style>
 </head>
 <body>
   <main>
@@ -82,7 +81,7 @@
         document.getElementById("timelimit").innerHTML +=  `${data["time_limit"]} (s)` ;
         document.getElementById("author-name").innerHTML += `${data["author"]}`;
         document.getElementById("topic").innerHTML += data["topic"] ;
-        console.log(data)
+        // console.log(data)
     })
     .catch(error => console.error('Lỗi:', error))
 

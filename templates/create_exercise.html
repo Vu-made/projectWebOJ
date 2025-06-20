@@ -4,10 +4,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Bài Tập</title>
-  <link rel="stylesheet" href="../static/create_exercise.css">  
-  <style>
-    
-  </style>
+  <link rel="stylesheet" href="../static/create_exercise.css">
+  <link rel="stylesheet" href="{{ url_for('static', filename='create_exercise.css') }}">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
   <main>
@@ -42,14 +41,14 @@
     <div id="problem-edit">
       <h3 id="code_problem">mã đề : </h3>
       <div id="header">
-        <div class="name-problem">
+        <!-- <div class="name-problem">
             <input type="text" placeholder="Viết tiêu đề">
             <button class="delete-btn" onclick="removeElement(this)">X</button>
-        </div>
+        </div> -->
       </div>
 
       <div id="body">
-        <div class="row-group">
+        <!-- <div class="row-group">
           <div class="toolbar">
             <button onclick="execCmd('bold')"><b>B</b></button>
             <button onclick="execCmd('italic')"><i>I</i></button>
@@ -63,7 +62,7 @@
             
           </div>
           <button class="delete-btn" onclick="removeElement(this)">X</button>
-        </div>
+        </div> -->
       </div>
 
       <div id="ex">
@@ -76,11 +75,11 @@
             </tr>
           </thead>
           <tbody id="hehe">
-            <tr>
+            <!-- <tr>
               <td><textarea></textarea></td>
               <td><textarea></textarea></td>
               <td><button class="delete-btn" onclick="removeRow(this)">X</button></td>
-            </tr>
+            </tr> -->
           </tbody>
         </table>
       </div>
@@ -98,7 +97,7 @@
       <div id="tool-container" class="tab-content">
         <div id="btn-tool"> 
           <button class="btn-tool" onclick="add_tool('header')">Thêm khung tiêu đề</button>
-          <button class="btn-tool" onclick="add_tool('body')">Thêm khung viết câu hỏi</button>
+          <button class="btn-tool" onclick="add_tool('body','Viết nội dung câu hỏi')">Thêm khung viết câu hỏi</button>
           <button class="btn-tool" onclick="add_tool('hehe')">Thêm khung ví dụ</button>
         </div>
         <div id="setting">
@@ -177,8 +176,8 @@
 
         
           <!-- <button onclick="exportHTML()" class="btn-tool">Xuất HTML</button> -->
-          <button class="btn-tool" onclick="submitData()">Đăng bài tập 📄</button>
-
+          <button class="btn-tool" id="submit-create-or-edit"></button>
+          
         </div>
       </div>
       
@@ -201,16 +200,15 @@
       sel.addRange(range);
     }
 
-    function add(id) {
-      let q = document.createElement('tr')
-      const chill = `
-          <td><textarea placeholder="Input"></textarea></td>
-          <td><textarea placeholder="Output"></textarea></td>
-          <td><button class="delete-btn" onclick="removeRow(this)">X</button></td>
-        </tr>
-      `;
-      q.innerHTML = chill ;
-      document.getElementById(id).appendChild(q);
+    function add(id , examples = [ {"input":"" , "output" : "" }] ) {
+      examples.forEach( ex => {
+        let q = document.createElement('tr')
+        q.innerHTML = `
+            <td><textarea placeholder="Input">${ex.input}</textarea></td>
+            <td><textarea placeholder="Output">${ex.output}</textarea></td>
+            <td><button class="delete-btn" onclick="removeRow(this)">X</button></td>`;
+        document.getElementById(id).appendChild(q);
+      });
     }
 
     function removeRow(btn) {
@@ -221,7 +219,7 @@
       btn.parentElement.remove();
     }
 
-    function add_tool(section) {
+    function add_tool(section,content) {
       if ( section === 'body') {
         const container = document.getElementById(section);
         container.innerHTML += `
@@ -235,7 +233,7 @@
               <button onclick="insertText(' ≠ ')">≠</button>
               <button onclick="insertText(' ∑ ')">∑</button>
             </div>
-            <div class="editor" contenteditable="true">Nhập nội dung tại đây...</div>
+            <div class="editor" contenteditable="true">${ content }</div>
             <button class="delete-btn" onclick="removeElement(this)">X</button>
           </div>`;
       } else if (section === 'hehe') {
@@ -249,6 +247,7 @@
             const input = document.createElement("input");
             input.type = "text";
             input.placeholder = "Viết tiêu đề";
+            input.value = content || ""; // Nếu có nội dung thì gán, nếu không thì để trống
 
             const btn = document.createElement("button");
             btn.className = "delete-btn";
@@ -316,9 +315,25 @@
         return (now + rand).slice(-10);               // luôn lấy 10 chữ số cuối
       }
 
-      let new_id = generateSafeUniqueCode(); // tạo mã đề duy nhất
+      let new_id = ( "{{ id }}" != '' ? "{{ id }}" : generateSafeUniqueCode() ); // tạo mã đề duy nhất
       document.getElementById("code_problem").innerHTML += new_id ;
-      async function submitData() {
+
+      function submitData() {
+          Swal.fire({
+              title: 'Xác nhận',
+              text: ( command=="create" ? "Bạn có chắc chắn muốn đăng bài tập này không?" : "Bạn có chắc chắn muốn cập nhật bài tập này không?"),
+              icon: 'warning',
+              showCancelButton: true,
+              confirmButtonText: 'Đồng ý',
+              cancelButtonText: 'Hủy'
+          }).then((result) => {
+              if (result.isConfirmed) {
+                  post_exercise();
+              }
+          });
+      }
+      
+      async function post_exercise() {
           
           // 1. Thu thập tiêu đề
           const titles = Array.from(document.querySelectorAll('#header .name-problem input'))
@@ -373,22 +388,44 @@
           };
 
           // 7. Gửi dữ liệu về Flask
-          fetch('/api/post_exercise', {
-              method: 'POST',
-              headers: {
-                  'Content-Type': 'application/json'
-              },
-              body: JSON.stringify(payload)
-          })
-          .then(res => res.json())
-          .then(data => {
-              alert('✅ Gửi thành công: ' + data.message);
-              window.location.href = '/';
-          })
-          .catch(err => {
-              console.error('❌ Lỗi khi gửi dữ liệu:', err);
-              alert('❌ Gửi thất bại!');
-          });
+          if ( command == "create" ) 
+          {
+            fetch('/api/post_exercise', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(payload)
+            })
+            .then(res => res.json())
+            .then(data => {
+                alert('✅ Gửi thành công: ' + data.message);
+                window.location.href = '/';
+            })
+            .catch(err => {
+                console.error('❌ Lỗi khi gửi dữ liệu:', err);
+                alert('❌ Gửi thất bại!');
+            });
+          }
+          else if ( command == "edit" ) 
+          {
+            fetch('/api/edit_exercise', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(payload)
+            })
+            .then(res => res.json())
+            .then(data => {
+                alert('✅ Cập nhật thành công: ' + data.message);
+                window.location.href = '/';
+            })
+            .catch(err => {
+                console.error('❌ Lỗi khi cập nhật dữ liệu:', err);
+                alert('❌ Cập nhật thất bại!');
+            });
+          }
       }
     </script>
     <script>
@@ -404,7 +441,55 @@
           document.getElementById(tabName).style.display = 'flex';
       }
 
-      switchTab('tool-container'); // Mặc định hiển thị tab công cụ
+      switchTab('tool-container');
+    </script>
+    <script>
+      command = "{{ command }}" ; // hoặc "edit" tuỳ vào ngữ cảnh
+      if ( command == "create" ) 
+      {
+          add_tool('header', '') ;
+          add_tool('body', 'Viết nội dung câu hỏi') ;
+          add_tool('hehe') ;
+          document.getElementById("submit-create-or-edit").innerHTML = 'Đăng bài tập 📄' ;
+          document.getElementById("submit-create-or-edit").onclick = submitData ;
+      }
+      else if ( command == "edit" ) 
+      {
+        document.getElementById("submit-create-or-edit").innerHTML = 'Cập nhật bài tập 📄' ;
+        document.getElementById("submit-create-or-edit").onclick = submitData ;
+        fetch('/api/render_exercise',{
+              method : 'POST',
+              headers : {
+                  'Content-Type': 'application/json'
+              },
+              body : JSON.stringify({ id : new_id })
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Tiêu đề
+            data.titles.forEach(title => {
+                add_tool('header', title);
+            });
+
+            // Nội dung câu hỏi
+            data.bodies.forEach(body => {
+                add_tool('body', body);
+            });
+
+            // Ví dụ input-output
+            add('hehe', data.examples);
+
+            // Thời gian giới hạn
+            document.getElementById('time').value = data.time_limit;
+
+            // Điểm
+            document.getElementById('point').value = data.point;
+
+            // Chủ đề
+            document.getElementById('topic-select').value = data.topic;
+        })
+        .catch(error => console.error('Lỗi:', error))
+    }
     </script>
 </body>
 </html>

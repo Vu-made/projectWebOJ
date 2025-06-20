@@ -1,0 +1,17 @@
+# Bỏ qua môi trường ảo
+.venv/
+venv/
+
+# Bỏ qua file cấu hình bí mật
+.env
+*.env
+
+# Bỏ qua file Python tạo ra
+__pycache__/
+*.pyc
+*.pyo
+
+# VSCode setting
+.vscode/
+# Bỏ qua file cấu hình của VSCode
+settings.json

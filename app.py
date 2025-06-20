@@ -267,7 +267,7 @@ async def edit_profile():
 
 @app.route('/create-exercise')
 async def create_exercise():
-    return await render_template("create_exercise.html")
+    return await render_template("create_exercise.html",command="create",id="")
 
 
 @app.route('/render_exercise/<id>')
@@ -345,7 +345,7 @@ async def result(job_id):
                 await execute ("""
                         INSERT IGNORE INTO solved_exercise ( username , content , code_exercise , type )
                         VALUES ( %s , %s , %s , %s )
-                    """, ( item["username"] , json.dumps(item["content"]) , item["code_exercise"] , ( "O" if item["pass"] else "X" ) ) )
+                    """, ( item["username"] , json.dumps(item["content"],ensure_ascii=False) , item["code_exercise"] , ( "O" if item["pass"] else "X" ) ) )
                 if item["pass"] : 
                     await execute ("""
                         INSERT IGNORE INTO solved_exercise_pass ( username , code_exercise )
@@ -387,7 +387,7 @@ async def topic_detail(topic_name):
                         <td>
                             <button class="vudzso3-button" onclick="window.location.href='/render_exercise/{i[0]}'">Xem</button>
                             {
-                                f'''<button class="vudzso2-btn vudzso2-btn-save" onlcick="editExercise"('{i[0]}')>Sửa</button>'''
+                                f'''<button class="vudzso2-btn vudzso2-btn-save" onclick="editExercise('{i[0]}')">Sửa</button>'''
                                 if  username_role == "admin" or (
                                     username_role == "teacher"and user == data.get("author","") 
                                 ) else ""
@@ -519,6 +519,34 @@ async def delete_exercise(code_exercise):
     except Exception as e:
         print("Lỗi khi xoá bài tập:", e)
         return "❌ Đã xảy ra lỗi khi xoá bài tập", 500
+
+@app.route("/edit-exercise/<code_exercise>")
+async def edit_exercise(code_exercise):
+    return await render_template("create_exercise.html", command="edit", id=code_exercise)
+
+@app.route("/api/edit_exercise", methods=["POST"])
+async def edit_exercise_api():
+    data = await request.get_json()
+    code_exercise = data.get("new_id", "")
+    exercise = {
+        "titles": data.get("titles", []),
+        "bodies": data.get("bodies", []),
+        "examples": data.get("examples", []),
+        "time_limit": data.get("timeLimit", ""),
+        "point": data.get("point", ""),
+        "author": session["username"]
+    }
+    testcase = {
+        "time_limit": data.get("timeLimit", ""),
+        "point": data.get("point", ""),
+        "tests": data.get("tests", {})
+    }
+    await execute("""
+        UPDATE meta SET
+            exercise=%s, testcase=%s, topic=%s
+        WHERE code_exercise=%s
+    """, (json.dumps(exercise, ensure_ascii=False), json.dumps(testcase, ensure_ascii=False), data.get("topic",""), code_exercise))
+    return jsonify({"message": "Đã cập nhật bài tập!"})
 
 # ======================== AUTH =============================
 async def login():

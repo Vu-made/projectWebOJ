@@ -5,17 +5,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Đăng nhập</title>
   <link rel="stylesheet" href="../static/login.css">
+  <link rel="stylesheet" href="{{ url_for('static', filename='login.css') }}">
 </head>
 <body>
 
   <div id="LOGO">
-    <img src="../static/logo.png" alt="">
+    <img src="{{ url_for('static', filename='logo.png') }}" alt="logo">
     <div class="spinner "></div>
   </div>
 
   <div id="window-right">
     <form class="form-container" action="/submit" method="POST" id="form-container">
-    <img id="logo" src="../static/logo.png" alt="">
+    <img id="logo" src="{{ url_for('static', filename='logo.png') }}" alt="">
 
     <label class="login-item" for="username">Tên đăng nhập:</label>
     <input class="login-item" type="text" id="username" name="username" required value="{{ username }}" placeholder="Tên đăng nhập"/>
